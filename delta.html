@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính NETT Output và Uc at Terminal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .error {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #d32f2f;
+            text-align: center;
+        }
+        @media (max-width: 480px) {
+            body {
+                margin: 10px;
+                padding: 10px;
+            }
+            input, button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Tính NETT Output và Uc at Terminal</h1>
+    
+    <div class="form-group">
+        <label for="networkVoltage">Network Voltage (V):</label>
+        <input type="number" id="networkVoltage" step="0.01" placeholder="Ví dụ: 230" required>
+    </div>
+    <div class="form-group">
+        <label for="networkFreq">Network Freq (Hz):</label>
+        <input type="number" id="networkFreq" step="0.01" placeholder="Ví dụ: 50" required>
+    </div>
+    <div class="form-group">
+        <label for="tuningFactor">Tuning Factor (%):</label>
+        <input type="number" id="tuningFactor" step="0.01" placeholder="Ví dụ: 95" required>
+    </div>
+    <div class="form-group">
+        <label for="ratedCapVoltage">Rated Cap. Voltage (V):</label>
+        <input type="number" id="ratedCapVoltage" step="0.01" placeholder="Ví dụ: 400" required>
+    </div>
+    <div class="form-group">
+        <label for="ratedCapFreq">Rated Cap. Freq (Hz):</label>
+        <input type="number" id="ratedCapFreq" step="0.01" placeholder="Ví dụ: 50" required>
+    </div>
+    <div class="form-group">
+        <label for="ratedCapOutput">Rated Cap. Output (kVAr):</label>
+        <input type="number" id="ratedCapOutput" step="0.01" placeholder="Ví dụ: 10" required>
+    </div>
+    <button onclick="calculateResults()">Tính toán</button>
+    <div id="results"></div>
+    <div id="error" class="error"></div>
+
+    <script>
+        function calculateResults() {
+            // Lấy giá trị từ input
+            const networkVoltage = parseFloat(document.getElementById("networkVoltage").value);
+            const networkFreq = parseFloat(document.getElementById("networkFreq").value);
+            const tuningFactor = parseFloat(document.getElementById("tuningFactor").value);
+            const ratedCapVoltage = parseFloat(document.getElementById("ratedCapVoltage").value);
+            const ratedCapFreq = parseFloat(document.getElementById("ratedCapFreq").value);
+            const ratedCapOutput = parseFloat(document.getElementById("ratedCapOutput").value);
+
+            // Kiểm tra dữ liệu đầu vào
+            if (isNaN(networkVoltage) || isNaN(networkFreq) || isNaN(tuningFactor) || 
+                isNaN(ratedCapVoltage) || isNaN(ratedCapFreq) || isNaN(ratedCapOutput) ||
+                networkVoltage <= 0 || networkFreq <= 0 || tuningFactor <= 0 || 
+                ratedCapVoltage <= 0 || ratedCapFreq <= 0 || ratedCapOutput <= 0) {
+                document.getElementById("error").innerHTML = 
+                    "Vui lòng nhập giá trị hợp lệ (> 0) cho tất cả các trường!";
+                document.getElementById("results").innerHTML = "";
+                return;
+            }
+
+            // Kiểm tra Tuning Factor không vượt quá 100%
+            if (tuningFactor > 100) {
+                document.getElementById("error").innerHTML = 
+                    "Tuning Factor phải nhỏ hơn hoặc bằng 100%!";
+                document.getElementById("results").innerHTML = "";
+                return;
+            }
+
+            // Tính NETT output
+            const nettOutput = (Math.pow(networkVoltage / ratedCapVoltage, 2) * ratedCapOutput) / (1 - (tuningFactor / 100));
+
+            // Tính Uc at terminal
+            const ucAtTerminal = (networkVoltage * 100) / (100 - tuningFactor);
+
+            // Hiển thị kết quả
+            document.getElementById("results").innerHTML = 
+                `NETT Output: <strong>${nettOutput.toFixed(2)} kVAr</strong><br>` +
+                `Uc at Terminal: <strong>${ucAtTerminal.toFixed(2)} V</strong>`;
+            document.getElementById("error").innerHTML = "";
+        }
+    </script>
+</body>
+</html>
