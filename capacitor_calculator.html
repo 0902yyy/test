@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Công Suất Đầu Ra Mới Của Tụ Điện (Q_new)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .error {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #d32f2f;
+            text-align: center;
+        }
+        @media (max-width: 480px) {
+            body {
+                margin: 10px;
+                padding: 10px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            input, button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Tính Công Suất Đầu Ra Mới Của Tụ Điện</h1>
+    <div class="form-group">
+        <label for="U_new">Điện áp mới (U_new, V):</label>
+        <input type="number" id="U_new" step="0.01" placeholder="Ví dụ: 200" required>
+    </div>
+    <div class="form-group">
+        <label for="f_new">Tần số mới (f_new, Hz):</label>
+        <input type="number" id="f_new" step="0.01" placeholder="Ví dụ: 50" required>
+    </div>
+    <div class="form-group">
+        <label for="U_cn">Điện áp định mức (U_cn, V):</label>
+        <input type="number" id="U_cn" step="0.01" placeholder="Ví dụ: 230" required>
+    </div>
+    <div class="form-group">
+        <label for="f_cn">Tần số định mức (f_cn, Hz):</label>
+        <input type="number" id="f_cn" step="0.01" placeholder="Ví dụ: 50" required>
+    </div>
+    <div class="form-group">
+        <label for="Q_cn">Công suất định mức (Q_cn, kVAr):</label>
+        <input type="number" id="Q_cn" step="0.01" placeholder="Ví dụ: 10" required>
+    </div>
+    <button onclick="calculateQNew()">Tính toán</button>
+    <div id="result"></div>
+    <div id="error" class="error"></div>
+
+    <script>
+        function calculateQNew() {
+            // Lấy giá trị từ input
+            const U_new = parseFloat(document.getElementById("U_new").value);
+            const f_new = parseFloat(document.getElementById("f_new").value);
+            const U_cn = parseFloat(document.getElementById("U_cn").value);
+            const f_cn = parseFloat(document.getElementById("f_cn").value);
+            const Q_cn = parseFloat(document.getElementById("Q_cn").value);
+
+            // Kiểm tra dữ liệu đầu vào
+            if (isNaN(U_new) || isNaN(f_new) || isNaN(U_cn) || isNaN(f_cn) || isNaN(Q_cn) || 
+                U_new <= 0 || f_new <= 0 || U_cn <= 0 || f_cn <= 0 || Q_cn <= 0) {
+                document.getElementById("error").innerHTML = 
+                    "Vui lòng nhập giá trị hợp lệ (> 0) cho tất cả các trường!";
+                document.getElementById("result").innerHTML = "";
+                return;
+            }
+
+            // Kiểm tra điều kiện U_new < U_cn
+            if (U_new >= U_cn) {
+                document.getElementById("error").innerHTML = 
+                    "Lỗi: Điện áp mới (U_new) phải nhỏ hơn điện áp định mức (U_cn)!";
+                document.getElementById("result").innerHTML = "";
+                return;
+            }
+
+            // Tính Q_new
+            const Q_new = (Math.pow(U_new, 2) / Math.pow(U_cn, 2)) * (f_new / f_cn) * Q_cn;
+
+            // Hiển thị kết quả
+            document.getElementById("result").innerHTML = 
+                `Công suất đầu ra mới (Q_new): <strong>${Q_new.toFixed(2)} kVAr</strong>`;
+            document.getElementById("error").innerHTML = "";
+        }
+    </script>
+</body>
+</html>
